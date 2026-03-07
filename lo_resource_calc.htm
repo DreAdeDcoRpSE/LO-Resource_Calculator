@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Last Oasis Resource Calculator</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --bg-tertiary: #1e1e1e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent: #4a90e2;
+            --success: #4caf50;
+            --warning: #4f4f4f;
+            --warning-hover: #3c3c3c;
+            --danger: #f44336;
+            --border: #404040;
+            --intructions-title: #ffff00;
+        }
+
+        a, a:link, a:visited  {
+          color: #82ff82;
+          text-decoration: none;
+        }
+
+        a:hover {
+          color: #00ff00;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        html {
+        	scrollbar-color: #666 #282828;
+          	scrollbar-width: thin;
+        }
+
+        ::-webkit-scrollbar {
+        	width: 13px;
+        	background-color: #111;
+        }
+
+        ::-webkit-scrollbar-thumb {
+        	background:
+        	radial-gradient(black 15%, transparent 16%) 0 0,
+        	radial-gradient(black 15%, transparent 16%) 4px 4px,
+        	radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 0 1px,
+        	radial-gradient(rgba(255,255,255,.1) 15%, transparent 20%) 4px 5px;
+        	background-color:#282828;
+        	background-size:8px 8px;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+        }
+
+        .banner-card {
+            grid-column: 1 / -1;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .footer-card {
+            grid-column: 1 / -1;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 1em;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3770b6ff;
+        }
+
+        button.danger {
+            background-color: var(--danger);
+        }
+
+        button.danger:hover {
+            background-color: #850c0cff;
+        }
+
+        .resource-inputs {
+            margin-top: 15px;
+        }
+
+        .resource-row {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .resource-row input {
+            margin-bottom: 0;
+        }
+
+        .add-btn {
+            background-color: var(--success);
+        }
+
+        .add-btn:hover {
+            background-color: #388e3c;
+        }
+
+        .result-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .result-item.header {
+            font-weight: 600;
+            background-color: var(--bg-tertiary);
+        }
+
+        .time-result {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--success);
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 4px;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-group button {
+            width: auto;
+        }
+
+        .total-resources {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .calculation-info {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(74, 144, 226, 0.1);
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .export-btn {
+            margin-top: 15px;
+            background-color: var(--warning);
+            border: 1px solid #008d00;
+        }
+
+        .export-btn:hover {
+            background-color: var(--warning-hover);
+            border: 2px solid #00ff00;
+        }
+
+        .help-text {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        #toggleInstructions {
+            background-color: var(--warning) !important;
+            color: white;
+            border: 1px solid var(--danger);
+            border-radius: 4px;
+            padding: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #toggleInstructions:hover {
+            background-color: var(--warning-hover) !important;
+            border: 1px solid var(--success);
+        }
+
+        .instructions-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+            margin-top: 0;
+            margin-bottom: 15px;
+            background-color: rgba(74, 144, 226, 0.1);
+            border: 0px solid #bbffc8ff;
+            border-radius: 4px;
+            padding: 0 10px;
+        }
+
+        .instructions-panel.show {
+            max-height: 800px;
+            border: 1px solid #bbffc8ff;
+        }
+
+        .instructions-panel p {
+            padding: 8px 0;
+            margin: 0;
+            font-size: 0.9em;
+        }
+
+        .instructions-titles {
+            color: var(--intructions-title);
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="banner-card" style="padding:0; border:none; box-shadow: none;">
+            <img src="https://raw.githubusercontent.com/DreAdeDcoRpSE/lo-admin-tool-assets/refs/heads/main/lo-banner.jpg" alt="Last Oasis" style="width:100%; object-fit:cover; border-radius:8px;">
+        </div>
+        <div class="card">
+            <h2 class="card-title">Last Oasis Resource Calculator</h2>
+
+            <button type="button" id="toggleInstructions" style="background-color: var(--warning); color: white; margin-bottom: 15px;">
+                ⬇️ How to Use ⬇️
+            </button>
+
+            <div id="instructions" class="instructions-panel">
+                <p><strong class="instructions-titles">Step 1:</strong> Enter your maintenance chest's <strong>total storage space</strong> (e.g., 50,000 for a full gold vault). To get this, you can count each block and multiply that by how much each block can hold, OR, you can just count the Total Rows x Total Columns x Stack Size (20 x 5 x 500) for a gold vault</p>
+                <p><strong class="instructions-titles">Step 2:</strong> Enter the <strong>stack size</strong> into the input. The stack size is seen when you put the resource in, you will see it be like 200, 300, or 500 per stack. That is the number to enter.</p>
+                <p><strong class="instructions-titles">Step 3:</strong> In-game, open your base maintenance panel. Enter each resource's <strong>daily upkeep value</strong> (the number shown next to each resource — see example image).<br>
+                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAXwBfAAD/4TIiaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLwA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/Pgo8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJBZG9iZSBYTVAgQ29yZSA1LjMtYzAxMSA2Ni4xNDU2NjEsIDIwMTIvMDIvMDYtMTQ6NTY6MjcgICAgICAgICI+CiAgIDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+CiAgICAgIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiCiAgICAgICAgICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyI+CiAgICAgICAgIDx4bXA6Q3JlYXRvclRvb2w+QWRvYmUgRmlyZXdvcmtzIENTNiAoV2luZG93cyk8L3htcDpDcmVhdG9yVG9vbD4KICAgICAgICAgPHhtcDpDcmVhdGVEYXRlPjIwMjUtMTItMjNUMjI6MTE6MTNaPC94bXA6Q3JlYXRlRGF0ZT4KICAgICAgICAgPHhtcDpNb2RpZnlEYXRlPjIwMjUtMTItMjNUMjI6MTE6NTBaPC94bXA6TW9kaWZ5RGF0ZT4KICAgICAgPC9yZGY6RGVzY3JpcHRpb24+CiAgICAgIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiCiAgICAgICAgICAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyI+CiAgICAgICAgIDxkYzpmb3JtYXQ+aW1hZ2UvanBlZzwvZGM6Zm9ybWF0PgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0idyI/Pv/bAEMABwQEBAUEBwUFBwoHBQcKDAkHBwkMDQsLDAsLDRENDQ0NDQ0RDQ8QERAPDRQUFhYUFB4dHR0eIiIiIiIiIiIiIv/bAEMBCAcHDQwNGBAQGBoVERUaICAgICAgICAgICAgICEgICAgICAhISEgICAhISEhISEhISIiIiIiIiIiIiIiIiIiIv/CABEIAB4A0wMBEQACEQEDEQH/xAAaAAACAwEBAAAAAAAAAAAAAAABAgADBAUG/8QAGAEBAQEBAQAAAAAAAAAAAAAAAAEDAgT/2gAMAwEAAhADEAAAAfFRAhpQjCjQlQIpAAIAUBCAINEFrVHVMBXXa43MvH08+soGKhTSIYTcZi4zgGLQmUIxmjWdWlMnPXo8fdw9fJm7y7BjNhScg6hsPMnoQDCFZaUDDlRgOea4JAjqlkAAgCBBAoADBokgUBQAAf/EACQQAAICAAYCAgMAAAAAAAAAAAMEAQIAEBESExQFIBUhIjBA/9oACAEBAAEFAtM9MaYiP06Zae2nt8O/0RgKSuElIw6rTjrXW0IGkg17lINMpYgBJWuK1CdAuOmWszhhIq8SMkWMoUeOIkY4ibxAuQllLxJ0jCxIiVtxF3NA4D5fLv8ARW8m2suvNYNuHA22yMWHpv7asmi1qs0eW5AspyqUkkJ2Ac1fIr79PxceAW5HwS7R1aD2fBLHZDz1cB2V2QVfM8O47urw12gc/kC0M3677aZ/X8f/xAAcEQABBAMBAAAAAAAAAAAAAAADAAERQAIhMRL/2gAIAQMBAT8BvjGij1NnDqaI3xFL6tS9f//EABkRAAIDAQAAAAAAAAAAAAAAAAJAAAEREP/aAAgBAgEBPwF8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" alt="rw-example.jpg"/>
+                <br>
+                In that image, the 706, would be the number you would put with the name Redwood.<br>
+                Once you fill in the first resource, click the "+Add Resource", and repeat with the next resources.
+                </p>
+                <p><strong class="instructions-titles">Step 4:</strong> Click <strong>Calculate</strong> to see your maximum maintenance time and optimal stack allocation.</p>
+                <p><em>Note: Results show whole hours (like the game) and use only full stacks.</em></p>
+            </div>
+
+            <div class="form-group">
+                <label for="totalSpace">Total Storage Space:</label>
+                <input type="number" id="totalSpace" value="50000" min="1">
+                <div class="help-text">e.g., 50000 for a gold maintenance vault</div>
+            </div>
+
+            <div class="form-group">
+                <label for="stackSize">Items Per Stack:</label>
+                <input type="number" id="stackSize" value="500" min="1">
+                <div class="help-text">e.g., Gigantic chest stacks 500 / stack</div>
+            </div>
+
+            <div class="form-group">
+                <label>Resources & <strong>Daily Costs</strong> (from in-game):</label>
+                <div class="help-text">Enter the daily upkeep values shown in your base maintenance panel.</div>
+                <div class="resource-inputs" id="resourceInputs">
+                    <div class="resource-row">
+                        <input type="text" placeholder="Item Name" class="item-input">
+                        <input type="number" placeholder="Daily Cost" class="cost-input" min="1" step="any">
+                    </div>
+                </div>
+                <button type="button" class="add-btn" onclick="addResourceRow()">+ Add Resource</button>
+            </div>
+
+            <div class="btn-group">
+                <button onclick="calculateResources()">Calculate</button>
+                <button class="danger" onclick="clearAll()">Clear All</button>
+            </div>
+
+            <button class="export-btn" onclick="exportResults()">Export Results</button>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Results</h2>
+            <div id="resultsContainer">
+                <div class="empty-state">
+                    Enter your resources and click "Calculate" to see results
+                </div>
+            </div>
+        </div>
+        <div class="footer-card" style="padding:0; border:none; box-shadow: none; text-align: center;">
+            Created by coRpSE, Copyright &copy <a href="https://www.headshotdomain.net" target="_blank">headshotdomain.net</a> <?php echo date("Y"); ?>
+        </div>
+    </div>
+
+    <script>
+        function addResourceRow() {
+            const container = document.getElementById('resourceInputs');
+            const row = document.createElement('div');
+            row.className = 'resource-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Item Name" class="item-input">
+                <input type="number" placeholder="Daily Cost" class="cost-input" min="1" step="any">
+            `;
+            container.appendChild(row);
+        }
+
+        function calculateResources() {
+            const totalSpace = parseFloat(document.getElementById('totalSpace').value);
+            const stackSize = parseFloat(document.getElementById('stackSize').value);
+
+            if (!totalSpace || !stackSize || totalSpace <= 0 || stackSize <= 0) {
+                alert('Please enter valid total space and stack size values');
+                return;
+            }
+
+            const maxStacks = Math.floor(totalSpace / stackSize);
+            if (maxStacks === 0) {
+                alert('Stack size is larger than total space');
+                return;
+            }
+
+            const resourceRows = document.querySelectorAll('.resource-row');
+            const resources = [];
+
+            for (let row of resourceRows) {
+                const item = row.querySelector('.item-input').value.trim();
+                const dailyCost = parseFloat(row.querySelector('.cost-input').value);
+
+                if (item && dailyCost && dailyCost > 0) {
+                    // Convert daily → hourly
+                    const hourlyCost = dailyCost / 24;
+                    resources.push({
+                        name: item,
+                        hourlyCost: hourlyCost
+                    });
+                }
+            }
+
+            if (resources.length === 0) {
+                alert('Please add at least one resource with a valid name and cost');
+                return;
+            }
+
+            let low = 0;
+            let high = totalSpace / Math.min(...resources.map(r => r.hourlyCost)) * 2;
+            let bestT = 0;
+            let bestAllocation = [];
+
+            for (let iter = 0; iter < 60; iter++) {
+                const mid = (low + high) / 2;
+                let totalStacksNeeded = 0;
+                const stacksForThisT = [];
+
+                for (let r of resources) {
+                    const amountNeeded = r.hourlyCost * mid;
+                    const stacksNeeded = Math.ceil(amountNeeded / stackSize);
+                    stacksForThisT.push(stacksNeeded);
+                    totalStacksNeeded += stacksNeeded;
+                }
+
+                if (totalStacksNeeded <= maxStacks && isFinite(totalStacksNeeded)) {
+                    bestT = mid;
+                    bestAllocation = [...stacksForThisT];
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+
+            const wholeHours = Math.floor(bestT);
+            const finalAllocation = resources.map(r => {
+                const needed = r.hourlyCost * wholeHours;
+                return Math.ceil(needed / stackSize);
+            });
+            const totalUsed = finalAllocation.reduce((a, b) => a + b, 0) * stackSize;
+
+            if (totalUsed > totalSpace) {
+                const fallbackHours = Math.max(0, wholeHours - 1);
+                bestT = fallbackHours;
+                bestAllocation = resources.map(r => {
+                    const needed = r.hourlyCost * fallbackHours;
+                    return Math.ceil(needed / stackSize);
+                });
+            } else {
+                bestT = wholeHours;
+                bestAllocation = finalAllocation;
+            }
+
+            const result = {
+                resources: resources.map((r, i) => ({
+                    name: r.name,
+                    stacks: bestAllocation[i] || 0,
+                    space: (bestAllocation[i] || 0) * stackSize
+                })),
+                totalTime: bestT,
+                totalSpaceUsed: bestAllocation.reduce((a, b) => a + b, 0) * stackSize
+            };
+
+            displayResults(result, totalSpace, stackSize);
+        }
+
+        function displayResults(result, totalSpace, stackSize) {
+            const container = document.getElementById('resultsContainer');
+
+            let html = `
+                <div class="time-result">
+                    Maximum Maintenance Time: ${Math.round(result.totalTime)} hours
+                </div>
+
+                <div class="total-resources">
+                    Total Space Used: ${result.totalSpaceUsed} / ${totalSpace} (${((result.totalSpaceUsed / totalSpace) * 100).toFixed(1)}%)
+                </div>
+
+                <div class="calculation-info">
+                    <strong>Note:</strong> Enter the <strong>daily upkeep values</strong> exactly as shown in your in-game base maintenance panel.
+                </div>
+
+                <div class="result-item header">
+                    <div>Resource</div>
+                    <div>Amount</div>
+                    <div>Stacks</div>
+                </div>
+            `;
+
+            for (let resource of result.resources) {
+                html += `
+                    <div class="result-item">
+                        <div>${resource.name}</div>
+                        <div>${resource.space}</div>
+                        <div>${resource.stacks}</div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all data? You will lose all current work and need to start fresh.')) {
+                document.getElementById('totalSpace').value = '50000';
+                document.getElementById('stackSize').value = '500';
+
+                const container = document.getElementById('resourceInputs');
+                container.innerHTML = `
+                    <div class="resource-row">
+                        <input type="text" placeholder="Item Name" class="item-input">
+                        <input type="number" placeholder="Daily Cost" class="cost-input" min="1" step="any">
+                    </div>
+                `;
+
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = `
+                    <div class="empty-state">
+                        Enter your resources and click "Calculate" to see results
+                    </div>
+                `;
+            }
+        }
+
+        function exportResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const timeResult = resultsContainer.querySelector('.time-result');
+            const totalResources = resultsContainer.querySelector('.total-resources');
+            const resultItems = resultsContainer.querySelectorAll('.result-item:not(.header)');
+
+            if (!timeResult) {
+                alert('Please calculate results first before exporting');
+                return;
+            }
+
+            // Extract clean text (remove extra whitespace)
+            const cleanTime = timeResult.textContent.trim();
+            const cleanTotal = totalResources.textContent.trim();
+
+            let exportText = "Last Oasis Resource Calculation Results\n";
+            exportText += "==================================\n\n";
+            exportText += cleanTime + "\n";
+            exportText += cleanTotal + "\n\n";
+            exportText += "Resource Distribution:\n";
+
+            // Define column widths (adjust as needed)
+            const nameWidth = 20;
+            const amountWidth = 10;
+            const stacksWidth = 8;
+
+            // Header
+            exportText += "Resource".padEnd(nameWidth) + "Amount".padEnd(amountWidth) + "Stacks".padEnd(stacksWidth) + "\n";
+            exportText += "-".repeat(nameWidth) + "-".repeat(amountWidth) + "-".repeat(stacksWidth) + "\n";
+
+            // Rows
+            resultItems.forEach(item => {
+                const cells = item.querySelectorAll('div');
+                if (cells.length >= 3) {
+                    const name = cells[0].textContent.trim().padEnd(nameWidth);
+                    const amount = cells[1].textContent.trim().padEnd(amountWidth);
+                    const stacks = cells[2].textContent.trim().padEnd(stacksWidth);
+                    exportText += name + amount + stacks + "\n";
+                }
+            });
+
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            a.download = `last_oasis_calculation_${month}-${day}-${year}_${hours}-${minutes}.txt`;
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('loResourceCalculator');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    document.getElementById('totalSpace').value = data.totalSpace || '50000';
+                    document.getElementById('stackSize').value = data.stackSize || '500';
+                    if (data.resources?.length) {
+                        const container = document.getElementById('resourceInputs');
+                        container.innerHTML = '';
+                        data.resources.forEach(r => {
+                            container.innerHTML += `
+                                <div class="resource-row">
+                                    <input type="text" class="item-input" value="${r.name || ''}">
+                                    <input type="number" class="cost-input" min="1" step="any" value="${r.cost || ''}">
+                                </div>
+                            `;
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Failed to load saved data');
+                }
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            const data = {
+                totalSpace: document.getElementById('totalSpace').value,
+                stackSize: document.getElementById('stackSize').value,
+                resources: Array.from(document.querySelectorAll('.resource-row')).map(row => ({
+                    name: row.querySelector('.item-input').value.trim(),
+                    cost: row.querySelector('.cost-input').value
+                })).filter(r => r.name && r.cost)
+            };
+            localStorage.setItem('loResourceCalculator', JSON.stringify(data));
+        });
+
+        document.getElementById('toggleInstructions').addEventListener('click', function() {
+            const instructions = document.getElementById('instructions');
+            const isShown = instructions.classList.contains('show');
+
+            if (isShown) {
+                instructions.classList.remove('show');
+                this.textContent = '⬇️ How to Use ⬇️';
+            } else {
+                instructions.classList.add('show');
+                this.textContent = '⬆️ Hide Instructions ⬆️';
+            }
+        });
+    </script>
+</body>
+</html>
