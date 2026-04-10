@@ -4,6 +4,8 @@
 
 A web-based tool designed to help **Last Oasis** players calculate maximum base maintenance time and optimal resource stack allocation based on their storage capacity and daily upkeep costs.
 
+## 🔗[CLICK HERE TO USE IT LIVE VIA GITHUB](https://dreadedcorpse.github.io/LO-Resource_Calculator/)
+
 ## 📖 About
 
 Managing base maintenance in Last Oasis requires careful planning of resource storage. This calculator helps you determine exactly how long your base will survive based on the contents of your maintenance chest and the daily upkeep values shown in-game.
